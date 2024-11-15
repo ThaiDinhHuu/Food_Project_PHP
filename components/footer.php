@@ -30,7 +30,7 @@
 
    </section>
 
-   <div class="credit">&copy; copyright @ <?= date('Y'); ?> by <span>mr. web designer</span> | all rights reserved!</div>
+   <div class="credit">&copy; copyright @ <?= date('Y'); ?> by <span>Lập trình web nâng cao</span> | Đại học Sài Gòn</div>
 
 </footer>
 

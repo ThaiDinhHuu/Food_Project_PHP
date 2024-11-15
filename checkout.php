@@ -25,6 +25,9 @@ if(isset($_POST['submit'])){
    $address = filter_var($address, FILTER_SANITIZE_STRING);
    $total_products = $_POST['total_products'];
    $total_price = $_POST['total_price'];
+   $image = $_POST['image'];
+   $image = filter_var($image, FILTER_SANITIZE_STRING);
+
 
    $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
    $check_cart->execute([$user_id]);
@@ -35,8 +38,8 @@ if(isset($_POST['submit'])){
          $message[] = 'please add your address!';
       }else{
          
-         $insert_order = $conn->prepare("INSERT INTO `orders`(user_id, name, number, email, method, address, total_products, total_price) VALUES(?,?,?,?,?,?,?,?)");
-         $insert_order->execute([$user_id, $name, $number, $email, $method, $address, $total_products, $total_price]);
+         $insert_order = $conn->prepare("INSERT INTO `orders`(user_id, name, number, email, method, address, total_products, total_price,image) VALUES(?,?,?,?,?,?,?,?,?)");
+         $insert_order->execute([$user_id, $name, $number, $email, $method, $address, $total_products, $total_price,$image]);
 
          $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
          $delete_cart->execute([$user_id]);
@@ -89,6 +92,7 @@ if(isset($_POST['submit'])){
       <?php
          $grand_total = 0;
          $cart_items[] = '';
+         $image_order[] = '';
          $select_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
          $select_cart->execute([$user_id]);
          if($select_cart->rowCount() > 0){
@@ -96,6 +100,8 @@ if(isset($_POST['submit'])){
                $cart_items[] = $fetch_cart['name'].' ('.$fetch_cart['price'].' x '. $fetch_cart['quantity'].') - ';
                $total_products = implode($cart_items);
                $grand_total += ($fetch_cart['price'] * $fetch_cart['quantity']);
+               $image_order[] = $fetch_cart['image'] ;
+               $image = implode($image_order);
       ?>
       <p><span class="name"><?= $fetch_cart['name']; ?></span><span class="price">$<?= $fetch_cart['price']; ?> x <?= $fetch_cart['quantity']; ?></span></p>
       <?php
@@ -105,9 +111,9 @@ if(isset($_POST['submit'])){
          }
       ?>
       <p class="grand-total"><span class="name">grand total :</span><span class="price">$<?= $grand_total; ?></span></p>
-      <a href="cart.php" class="btn">veiw cart</a>
+      <a href="cart.php" class="btn">view cart</a>
    </div>
-
+   <input type="hidden" name="image" value="<?= $image; ?>">
    <input type="hidden" name="total_products" value="<?= $total_products; ?>">
    <input type="hidden" name="total_price" value="<?= $grand_total; ?>" value="">
    <input type="hidden" name="name" value="<?= $fetch_profile['name'] ?>">

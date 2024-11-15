@@ -70,6 +70,20 @@ if(isset($_GET['delete'])){
       <p> number : <span><?= $fetch_orders['number']; ?></span> </p>
       <p> address : <span><?= $fetch_orders['address']; ?></span> </p>
       <p> total products : <span><?= $fetch_orders['total_products']; ?></span> </p>
+      
+      <?php
+          $image_names = preg_split("/(?<=\.png)(?=\D)/", $fetch_orders['image']);
+           foreach ($image_names as $image) {
+           $split_position = strpos($image, '.png');
+            if ($split_position !== false) {
+              echo '<img style="width:150px;height:150px;" src="../uploaded_img/' . substr($image, 0, $split_position) . '.png" alt="">'; 
+    }
+}
+?>
+
+
+
+
       <p> total price : <span>$<?= $fetch_orders['total_price']; ?>/-</span> </p>
       <p> payment method : <span><?= $fetch_orders['method']; ?></span> </p>
       <form action="" method="POST">

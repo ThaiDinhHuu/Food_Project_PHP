@@ -20,9 +20,11 @@ if(isset($_POST['update'])){
    $price = filter_var($price, FILTER_SANITIZE_STRING);
    $category = $_POST['category'];
    $category = filter_var($category, FILTER_SANITIZE_STRING);
+   $details = $_POST['details'];
+   $details = filter_var($details, FILTER_SANITIZE_STRING);
 
-   $update_product = $conn->prepare("UPDATE `products` SET name = ?, category = ?, price = ? WHERE id = ?");
-   $update_product->execute([$name, $category, $price, $pid]);
+   $update_product = $conn->prepare("UPDATE `products` SET name = ?, category = ?, price = ?, details = ? WHERE id = ?");
+   $update_product->execute([$name, $category, $price,$details, $pid]);
 
    $message[] = 'product updated!';
 
@@ -62,7 +64,14 @@ if(isset($_POST['update'])){
 
    <!-- custom css file link  -->
    <link rel="stylesheet" href="../css/admin_style.css">
-
+   <style>
+        .preview {
+            margin-top: 10px;
+            width: 200px; /* kích thước xem trước */
+            height: 200px;
+            object-fit: cover; /* giữ tỉ lệ và cắt nếu cần */
+        }
+    </style>
 </head>
 <body>
 
@@ -97,8 +106,31 @@ if(isset($_POST['update'])){
          <option value="drinks">drinks</option>
          <option value="desserts">desserts</option>
       </select>
+      <span>update details</span>
+      <textarea name="details" class="box" required cols="30" rows="10"><?= $fetch_products['details']; ?></textarea>
       <span>update image</span>
-      <input type="file" name="image" class="box" accept="image/jpg, image/jpeg, image/png, image/webp">
+      <input type="file" name="image" id="fileInput" class="box" accept="image/jpg, image/jpeg, image/png, image/webp">
+      <img id="imagePreview" class="preview" alt="Image Preview" style="display:none;">
+      <script>
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0]; // Lấy tệp đã chọn
+            const preview = document.getElementById('imagePreview'); // Tìm thành phần img để hiển thị hình ảnh
+
+            if (file) { // Kiểm tra xem có tệp không
+                const reader = new FileReader(); // Tạo đối tượng FileReader để đọc tệp
+                
+                // Sự kiện được gọi khi FileReader hoàn thành việc đọc tệp
+                reader.onload = function(e) {
+                    preview.src = e.target.result; // Đặt src của img bằng kết quả đọc
+                    preview.style.display = 'block'; // Hiển thị ảnh
+                };
+                
+                reader.readAsDataURL(file); // Đọc tệp dưới dạng DataURL (Base64)
+            } else {
+                preview.style.display = 'none'; // Nếu không có tệp, ẩn ảnh
+            }
+        });
+    </script>
       <div class="flex-btn">
          <input type="submit" value="update" class="btn" name="update">
          <a href="products.php" class="option-btn">go back</a>

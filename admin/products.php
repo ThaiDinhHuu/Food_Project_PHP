@@ -18,6 +18,8 @@ if(isset($_POST['add_product'])){
    $price = filter_var($price, FILTER_SANITIZE_STRING);
    $category = $_POST['category'];
    $category = filter_var($category, FILTER_SANITIZE_STRING);
+   $details = $_POST['details'];
+   $details = filter_var($details, FILTER_SANITIZE_STRING);
 
    $image = $_FILES['image']['name'];
    $image = filter_var($image, FILTER_SANITIZE_STRING);
@@ -36,8 +38,8 @@ if(isset($_POST['add_product'])){
       }else{
          move_uploaded_file($image_tmp_name, $image_folder);
 
-         $insert_product = $conn->prepare("INSERT INTO `products`(name, category, price, image) VALUES(?,?,?,?)");
-         $insert_product->execute([$name, $category, $price, $image]);
+         $insert_product = $conn->prepare("INSERT INTO `products`(name, details, category, price, image) VALUES(?,?,?,?,?)");
+         $insert_product->execute([$name, $details, $category, $price, $image]);
 
          $message[] = 'new product added!';
       }
@@ -47,8 +49,15 @@ if(isset($_POST['add_product'])){
 }
 
 if(isset($_GET['delete'])){
-
    $delete_id = $_GET['delete'];
+
+   $check_orders = $conn->prepare("SELECT * FROM `orders` WHERE total_products LIKE ? AND payment_status != 'completed'");
+    $check_orders->execute([$delete_id]);
+    if ($check_orders->rowCount() > 0) {
+      // Nếu có đơn hàng chưa hoàn thành, không cho phép xóa
+      echo "Cannot delete products, there are unfinished orders.";
+  } else {
+   
    $delete_product_image = $conn->prepare("SELECT * FROM `products` WHERE id = ?");
    $delete_product_image->execute([$delete_id]);
    $fetch_delete_image = $delete_product_image->fetch(PDO::FETCH_ASSOC);
@@ -58,7 +67,7 @@ if(isset($_GET['delete'])){
    $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE pid = ?");
    $delete_cart->execute([$delete_id]);
    header('location:products.php');
-
+  }
 }
 
 ?>
@@ -76,7 +85,14 @@ if(isset($_GET['delete'])){
 
    <!-- custom css file link  -->
    <link rel="stylesheet" href="../css/admin_style.css">
-
+   <style>
+        .preview {
+            margin-top: 10px;
+            width: 200px; /* kích thước xem trước */
+            height: 200px;
+            object-fit: cover; /* giữ tỉ lệ và cắt nếu cần */
+        }
+    </style>
 </head>
 <body>
 
@@ -96,8 +112,31 @@ if(isset($_GET['delete'])){
          <option value="fast food">fast food</option>
          <option value="drinks">drinks</option>
          <option value="desserts">desserts</option>
-      </select>
-      <input type="file" name="image" class="box" accept="image/jpg, image/jpeg, image/png, image/webp" required>
+      </select>  
+      <textarea name="details" placeholder="enter product details" class="box" required maxlength="500" cols="30" rows="10"></textarea> 
+      <input type="file" name="image" id="fileInput" class="box" accept="image/jpg, image/jpeg, image/png, image/webp" required>
+      <img id="imagePreview" class="preview" alt="Image Preview" style="display:none;">
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0]; // Lấy tệp đã chọn
+            const preview = document.getElementById('imagePreview'); // Tìm thành phần img để hiển thị hình ảnh
+
+            if (file) { // Kiểm tra xem có tệp không
+                const reader = new FileReader(); // Tạo đối tượng FileReader để đọc tệp
+                
+                // Sự kiện được gọi khi FileReader hoàn thành việc đọc tệp
+                reader.onload = function(e) {
+                    preview.src = e.target.result; // Đặt src của img bằng kết quả đọc
+                    preview.style.display = 'block'; // Hiển thị ảnh
+                };
+                
+                reader.readAsDataURL(file); // Đọc tệp dưới dạng DataURL (Base64)
+            } else {
+                preview.style.display = 'none'; // Nếu không có tệp, ẩn ảnh
+            }
+        });
+    </script>
       <input type="submit" value="add product" name="add_product" class="btn">
    </form>
 
@@ -124,12 +163,13 @@ if(isset($_GET['delete'])){
          <div class="category"><?= $fetch_products['category']; ?></div>
       </div>
       <div class="name"><?= $fetch_products['name']; ?></div>
+      <div class="details"><?= $fetch_products['details']; ?></div>
       <div class="flex-btn">
          <a href="update_product.php?update=<?= $fetch_products['id']; ?>" class="option-btn">update</a>
          <a href="products.php?delete=<?= $fetch_products['id']; ?>" class="delete-btn" onclick="return confirm('delete this product?');">delete</a>
       </div>
    </div>
-   <?php
+   <?php  
          }
       }else{
          echo '<p class="empty">no products added yet!</p>';

@@ -11,6 +11,7 @@ if(isset($message)){
 }
 ?>
 
+
 <header class="header">
 
    <section class="flex">
@@ -27,6 +28,7 @@ if(isset($message)){
       </nav>
 
       <div class="icons">
+         <a href="admin_search.php"><i class="fas fa-search"></i></a>
          <div id="menu-btn" class="fas fa-bars"></div>
          <div id="user-btn" class="fas fa-user"></div>
       </div>

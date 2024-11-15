@@ -27,7 +27,13 @@ include 'components/add_cart.php';
 
    <!-- custom css file link  -->
    <link rel="stylesheet" href="css/style.css">
-
+   <style>
+        .details {
+            font-size: 20px;  /* Đặt kích thước phông chữ là 20px */
+            word-wrap: break-word;  /* Cho phép tự động xuống dòng */
+            white-space: normal;  /* Đảm bảo rằng văn bản không bị giữ nguyên trên một dòng */
+        }
+    </style>
 </head>
 <body>
    
@@ -56,6 +62,7 @@ include 'components/add_cart.php';
          <div class="price"><span>$</span><?= $fetch_products['price']; ?></div>
          <input type="number" name="qty" class="qty" min="1" max="99" value="1" maxlength="2">
       </div>
+      <div class="details"><?= $fetch_products['details']; ?></div>
       <button type="submit" name="add_to_cart" class="cart-btn">add to cart</button>
    </form>
    <?php

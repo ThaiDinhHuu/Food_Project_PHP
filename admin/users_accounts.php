@@ -10,6 +10,18 @@ if(!isset($admin_id)){
    header('location:admin_login.php');
 }
 
+if (isset($_GET['lock'])) {
+   $user_id = $_GET['lock'];
+   $stmt = $conn->prepare("UPDATE users SET is_locked = TRUE WHERE id = ?");
+   $stmt->execute([$user_id]);
+   header('location:users_accounts.php'); // Chuyển hướng sau khi khóa
+} elseif (isset($_GET['unlock'])) {
+   $user_id = $_GET['unlock'];
+   $stmt = $conn->prepare("UPDATE users SET is_locked = FALSE WHERE id = ?");
+   $stmt->execute([$user_id]);
+   header('location:users_accounts.php'); // Chuyển hướng sau khi mở khóa
+}
+
 if(isset($_GET['delete'])){
    $delete_id = $_GET['delete'];
    $delete_users = $conn->prepare("DELETE FROM `users` WHERE id = ?");
@@ -54,11 +66,17 @@ if(isset($_GET['delete'])){
       $select_account = $conn->prepare("SELECT * FROM `users`");
       $select_account->execute();
       if($select_account->rowCount() > 0){
-         while($fetch_accounts = $select_account->fetch(PDO::FETCH_ASSOC)){  
+         while($fetch_accounts = $select_account->fetch(PDO::FETCH_ASSOC)){      
    ?>
    <div class="box">
       <p> user id : <span><?= $fetch_accounts['id']; ?></span> </p>
       <p> username : <span><?= $fetch_accounts['name']; ?></span> </p>
+      <?php if ($fetch_accounts['is_locked']) { ?>
+         <a href="users_accounts.php?unlock=<?= $fetch_accounts['id']; ?>" class="btn">Unlock</a>
+      <?php } else { ?>
+         <a href="users_accounts.php?lock=<?= $fetch_accounts['id']; ?>" class="btn">Lock</a>
+      <?php } ?>
+      
       <a href="users_accounts.php?delete=<?= $fetch_accounts['id']; ?>" class="delete-btn" onclick="return confirm('delete this account?');">delete</a>
    </div>
    <?php
@@ -73,12 +91,6 @@ if(isset($_GET['delete'])){
 </section>
 
 <!-- user accounts section ends -->
-
-
-
-
-
-
 
 <!-- custom js file link  -->
 <script src="../js/admin_script.js"></script>

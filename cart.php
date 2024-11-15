@@ -104,7 +104,7 @@ $grand_total = 0;
 
    <div class="cart-total">
       <p>cart total : <span>$<?= $grand_total; ?></span></p>
-      <a href="checkout.php" class="btn <?= ($grand_total > 1)?'':'disabled'; ?>">proceed to checkout</a>
+      <a href="checkout.php" class="btn <?= ($grand_total > 0)?'':'disabled'; ?>">proceed to checkout</a>
    </div>
 
    <div class="more-btn">

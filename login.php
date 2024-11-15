@@ -17,7 +17,7 @@ if(isset($_POST['submit'])){
    $pass = sha1($_POST['pass']);
    $pass = filter_var($pass, FILTER_SANITIZE_STRING);
 
-   $select_user = $conn->prepare("SELECT * FROM `users` WHERE email = ? AND password = ?");
+   $select_user = $conn->prepare("SELECT * FROM `users` WHERE email = ? AND password = ? AND is_locked = FALSE");
    $select_user->execute([$email, $pass]);
    $row = $select_user->fetch(PDO::FETCH_ASSOC);
 
