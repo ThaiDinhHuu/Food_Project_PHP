@@ -1,4 +1,6 @@
 <h2 align="center">Food Website 🍲</h2>
+![Uploading {F3B0A298-66DE-4BEB-AD22-B64B9F510D58}.png…]()
+
 
 ## Giới thiệu
 - **Đây là một website bán thực phẩm trực tuyến được xây dựng bằng PHP. Website cho phép người dùng tìm kiếm, xem thông tin chi tiết các món ăn, và đặt hàng. Với giao diện thân thiện và dễ sử dụng, website "Food" là nền tảng lý tưởng để người dùng trải nghiệm mua sắm trực tuyến các sản phẩm thực phẩm**
